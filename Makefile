@@ -13,7 +13,8 @@ $(VENV): requirements.txt
 	touch $(VENV)
 
 run: $(VENV) 
-	. $(BIN)/activate; python3 main.py
+	@. $(BIN)/activate
+	@python3 main.py
 
 tidy: $(VENV)
 	@pip list --format=freeze > requirements.txt
