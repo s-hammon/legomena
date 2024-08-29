@@ -14,7 +14,15 @@ class Corpus:
         split_text = self.text.split(sep=sep, maxsplit=maxsplit)
         return [ Corpus(text.strip()) for text in split_text ]
 
-    def print_lines(self, n: int, start: int=0) -> str:
+    def read_lines(self, n: int, start: int=0) -> str:
+        '''
+        Returns the specified number of lines in the text, starting from the start index.
+
+        Args:
+            n (int): The number of lines to return
+            start (int): The starting index of the lines to return
+                - Default: 0 (start from the beginning of the text)
+        '''
         lines = self.text.splitlines()
         end = min(start + n, len(lines))
 
@@ -24,9 +32,17 @@ class Corpus:
         return self.text.split()
 
     def total_words(self) -> int:
+        '''
+        Returns the total number of words in the text.
+        Calls word_arr() and returns the length of the list.
+        '''
         return len(self.word_arr())
 
     def get_word_count(self) -> Dict[str, int]:
+        '''
+        Returns a dictionary of words and their counts in the text.
+        It will ignore case and punctuation.
+        '''
         word_count = {}
 
         words = re.findall(r'\b\w+\b', self.text.lower())
@@ -40,12 +56,19 @@ class Corpus:
         return word_count
     
     def get_top_words(self, n: int=5) -> Dict[str, int]:
+        '''
+        Returns the top n words and their count in the text by frequency of occurrence.
+
+        Args:
+            n (int): The number of top words to return
+                - Default: 5
+        '''
         word_count = self.get_word_count()
         return dict(sorted(word_count.items(), key=lambda x: x[1], reverse=True)[:n])
 
     def legomena(self, n: int=1) -> List[str]:
         '''
-        Returns a list of words that appear exactly n times in the text
+        Returns a list of words that appear exactly n times in the text.
         
         Args:
             n (int): The number of times a word appears in the text
@@ -53,7 +76,6 @@ class Corpus:
         '''
         word_count = self.get_word_count()
         return list(filter(lambda x: word_count[x] == n, word_count))
-        # return [ word for word in word_count if word_count[word] == n ]
 
 def from_file(fpath: str) -> Corpus:
     with open(fpath, 'r') as f:

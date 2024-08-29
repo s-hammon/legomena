@@ -22,4 +22,6 @@ def main():
         Count of tetrakis legomena: {tetrakis}
     ''')
 
+    print(text.get_top_words())
+
 main()
