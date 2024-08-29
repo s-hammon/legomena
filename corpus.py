@@ -53,7 +53,17 @@ class Corpus:
 
             word_count[word] = 1
 
-        return word_count
+        return dict(sorted(word_count.items(), key=lambda x: x[1], reverse=True)) 
+
+    def get_word_count_proportion(self) -> Dict[str, float]:
+        '''
+        Returns a dictionary of words and their proportion in the text.
+        The proportion is the count of the word divided by the total number of words.
+        '''
+        word_count = self.get_word_count()
+        total_words = self.total_words()
+
+        return dict(map(lambda x: (x, word_count[x] / total_words), word_count))
     
     def get_top_words(self, n: int=5) -> Dict[str, int]:
         '''
@@ -64,7 +74,7 @@ class Corpus:
                 - Default: 5
         '''
         word_count = self.get_word_count()
-        return dict(sorted(word_count.items(), key=lambda x: x[1], reverse=True)[:n])
+        return dict(list(word_count.items())[:n])
 
     def legomena(self, n: int=1) -> List[str]:
         '''

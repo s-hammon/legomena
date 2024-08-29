@@ -1,27 +1,40 @@
-import numpy as np
-from pathlib import Path
+import matplotlib.pyplot as plt 
+import numpy as np 
+from pathlib import Path 
 
 from corpus import from_gutenberg
 
+
 def classic_zipf(N, k, s=1):
-    return (1 / k ** s) / (np.sum(1 / (np.arange(1, N + 1 ) ** s)))
+    return (1 / k ** s) / float(np.sum(1 / (np.arange(1, N + 1 ) ** s)))
 
 def main():
     whale = Path(".data/moby_dick.txt")
     text = from_gutenberg(whale)
+    wordbank = text.get_word_count()
 
-    hapax = len(text.legomena(1))
-    dis = len(text.legomena(2))
-    tris = len(text.legomena(3))
-    tetrakis = len(text.legomena(4))
+    vocab_size = len(wordbank)
+    N = sum(wordbank.values())
+    
+    vectorize = np.vectorize(lambda x: classic_zipf(N, x))
 
-    print(f'''
-        Count of hapax legomena: {hapax}
-        Count of dis legomena: {dis}
-        Count of tris legomena: {tris}
-        Count of tetrakis legomena: {tetrakis}
-    ''')
+    prop = np.array(list(sorted(list(wordbank.values()), reverse=True))) / len(wordbank)
+    pred = vectorize(list(wordbank.values()))
 
-    print(text.get_top_words())
+    log_a = np.log(prop * N)
+    log_v = np.log(pred * N)
+    x = np.log(list(range(1, vocab_size+1)))
+
+    plt.figure(figsize=(10,6))
+    plt.plot(x, log_v, marker='o')
+    plt.plot(x, log_a, marker='x')
+    plt.xlabel('Word Rank')
+    plt.ylabel('Log Zipf Proportion')
+    plt.title("Plot of Word Index vs Log Zipf Proportion")
+    plt.grid(True)
+
+    plt.savefig(".data/zipf.png")
+    plt.close()
+    
 
 main()

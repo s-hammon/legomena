@@ -10,7 +10,7 @@ endif
 $(VENV): requirements.txt
 	$(PY) -m venv $(VENV)
 	$(BIN)/pip install -r requirements.txt
-	touch $(VENV)
+	@touch $(VENV)
 
 run: $(VENV) 
 	@. $(BIN)/activate
