@@ -12,9 +12,13 @@ $(VENV): requirements.txt
 	$(BIN)/pip install -r requirements.txt
 	@touch $(VENV)
 
+test: $(VENV)
+	@. $(BIN)/activate
+	@${PY} -m unittest discover -s .
+
 run: $(VENV) 
 	@. $(BIN)/activate
-	@python3 main.py
+	@${PY} main.py
 
 tidy: $(VENV)
 	@pip list --format=freeze > requirements.txt

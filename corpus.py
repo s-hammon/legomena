@@ -1,5 +1,5 @@
 import re
-from typing import List, Dict
+from typing import Tuple, Union, List, Dict
 
 
 class Corpus:
@@ -9,11 +9,10 @@ class Corpus:
     def __repr__(self):
         return f"{self.text[:500]}..." if len(self.text) > 500 else f"{self.text}"
 
+    def __eq__(self, other: 'Corpus'):
+        return self.text == other.text
     
-    def split(self, sep: str=None, maxsplit: int=-1) -> List['Corpus']:
-        split_text = self.text.split(sep=sep, maxsplit=maxsplit)
-        return [ Corpus(text.strip()) for text in split_text ]
-
+    
     def read_lines(self, n: int, start: int=0) -> str:
         '''
         Returns the specified number of lines in the text, starting from the start index.
@@ -54,16 +53,27 @@ class Corpus:
             word_count[word] = 1
 
         return dict(sorted(word_count.items(), key=lambda x: x[1], reverse=True)) 
+    
+    def rank_words(self) -> List[Tuple[int, int]]:
+        '''
+        Returns the rank of the text by the number of words.
+        '''
+        word_count = self.get_word_count()
+        words = []
+        for i, (_, count) in enumerate(word_count.items()):
+            words.append((i+1, count))
+        
+        return words
 
-    def get_word_count_proportion(self) -> Dict[str, float]:
+    def get_ranked_proportion(self) -> List[Tuple[int, int]]:
         '''
         Returns a dictionary of words and their proportion in the text.
         The proportion is the count of the word divided by the total number of words.
         '''
-        word_count = self.get_word_count()
+        rank_words = self.rank_words()
         total_words = self.total_words()
 
-        return dict(map(lambda x: (x, word_count[x] / total_words), word_count))
+        return [(rank, count/total_words) for rank, count in rank_words]
     
     def get_top_words(self, n: int=5) -> Dict[str, int]:
         '''
@@ -93,7 +103,25 @@ def from_file(fpath: str) -> Corpus:
 
     return Corpus(text)
 
-def from_gutenberg(fpath: str) -> Corpus:
+def from_gutenberg(fpath: str, sep: Union[str, re.Pattern]) -> Corpus:
     text = from_file(fpath)
-    delim = '*END THE SMALL PRINT! FOR PUBLIC DOMAIN ETEXTS*Ver.04.29.93*END*'
-    return text.split(delim)[1]
+    pattern = re.compile(sep)
+    text_split = split_text(text, sep=pattern)
+    return text_split[1]
+
+def split_text(text: Corpus, sep: Union[str, re.Pattern]=None, maxsplit: int=-1) -> List['Corpus']:
+        if not isinstance(text, Corpus) or text is None:
+            raise TypeError("Text is not of type Corpus")
+
+        if not isinstance(maxsplit, int) or maxsplit is None:
+            raise TypeError("Maxsplit is not of type int")
+
+        if text.text == "":
+            raise ValueError("Text is empty")
+
+        if isinstance(sep, re.Pattern):
+            split_text = re.split(pattern=sep, string=text.text)
+        else:
+            split_text = text.text.split(sep=sep, maxsplit=maxsplit)
+        
+        return [ Corpus(text.strip()) for text in split_text ]

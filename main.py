@@ -10,20 +10,26 @@ def classic_zipf(N, k, s=1):
 
 def main():
     whale = Path(".data/moby_dick.txt")
-    text = from_gutenberg(whale)
-    wordbank = text.get_word_count()
+    pattern = r"\*\*\* START OF THE PROJECT GUTENBERG EBOOK .*? \*\*\*"
+    text = from_gutenberg(whale, pattern)
+    wordbank = text.rank_words()
+    prop = text.get_ranked_proportion()
+    print(wordbank[0])
 
-    vocab_size = len(wordbank)
-    N = sum(wordbank.values())
+    N = len(text.word_arr())
+    print(N)
     
     vectorize = np.vectorize(lambda x: classic_zipf(N, x))
 
-    prop = np.array(list(sorted(list(wordbank.values()), reverse=True))) / len(wordbank)
-    pred = vectorize(list(wordbank.values()))
+    pred = vectorize([ w[0] for w in wordbank ])
+    print(pred[:5])
+    print(prop[:5])
 
-    log_a = np.log(prop * N)
+
+    actual = np.array([ p[1] for p in prop ])
+    log_a = np.log(actual * N)
     log_v = np.log(pred * N)
-    x = np.log(list(range(1, vocab_size+1)))
+    x = np.log(list(range(1, len(prop)+1)))
 
     plt.figure(figsize=(10,6))
     plt.plot(x, log_v, marker='o')
