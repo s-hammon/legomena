@@ -14,16 +14,12 @@ def main():
     text = from_gutenberg(whale, pattern)
     wordbank = text.rank_words()
     prop = text.get_ranked_proportion()
-    print(wordbank[0])
 
     N = len(text.word_arr())
-    print(N)
     
     vectorize = np.vectorize(lambda x: classic_zipf(N, x))
 
     pred = vectorize([ w[0] for w in wordbank ])
-    print(pred[:5])
-    print(prop[:5])
 
 
     actual = np.array([ p[1] for p in prop ])
