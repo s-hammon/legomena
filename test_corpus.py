@@ -4,12 +4,12 @@ import unittest
 from corpus import Corpus, split_text
 
 class TestCorpus(unittest.TestCase):
-    def test_corpus_split_test(self):
+    def test_corpus_split_text(self):
         cases = [
             {
                 "name": "test split on whitespace",
                 "params": {
-                    "text": Corpus("test split on whitespace"),
+                    "text": "test split on whitespace",
                 },
                 "want": [
                     Corpus("test"), Corpus("split"), Corpus("on"), Corpus("whitespace")
@@ -18,7 +18,7 @@ class TestCorpus(unittest.TestCase):
             {
                 "name": "test split on delimiter",
                 "params": {
-                    "text": Corpus("test, split, on, delimiter"),
+                    "text": "test, split, on, delimiter",
                     "sep": ", ",
                 },
                 "want": [
@@ -28,7 +28,7 @@ class TestCorpus(unittest.TestCase):
             {
                 "name": "test split on pattern",
                 "params": {
-                    "text": Corpus("test split ** on ** pattern"),
+                    "text": "test split ** on ** pattern",
                     "sep": re.compile(r'\s*\*\*.*?\*\*\s*'),
                 },
                 "want": [
@@ -46,16 +46,8 @@ class TestCorpus(unittest.TestCase):
             {
                 "name": "test throw error on invalid pattern type",
                 "params": {
-                    "text": Corpus("test split on invalid pattern type"),
+                    "text": "test split on invalid pattern type",
                     "sep": 1,
-                },
-                "want":
-                    TypeError
-            },
-            {
-                "name": "test throw error on invalid text type",
-                "params": {
-                    "text": "test split on invalid text type",
                 },
                 "want":
                     TypeError
@@ -63,7 +55,7 @@ class TestCorpus(unittest.TestCase):
             {
                 "name": "test throw error on empty text",
                 "params": {
-                    "text": Corpus(""),
+                    "text": "",
                 },
                 "want":
                     ValueError
@@ -71,7 +63,7 @@ class TestCorpus(unittest.TestCase):
             {
                 "name": "test throw error on invalid maxsplit type",
                 "params": {
-                    "text": Corpus("test split on invalid maxsplit type"),
+                    "text": "test split on invalid maxsplit type",
                     "maxsplit": "1",
                 },
                 "want":

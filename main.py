@@ -1,26 +1,24 @@
 import matplotlib.pyplot as plt 
-import numpy as np 
+import numpy as np
 from pathlib import Path 
 
-from corpus import from_file, from_gutenberg
+from corpus import from_file
+from stats import vectorized_zipf
 
-
-def classic_zipf(N, k, s=1):
-    return (1 / k ** s) / float(np.sum(1 / (np.arange(1, N + 1 ) ** s)))
-
-def vectorized_zipf(N, data, s=1):
-    vectorize = np.vectorize(lambda x: classic_zipf(N, x, s))
-    return vectorize(data)
 
 def main():
-    whale = Path(".data/moby_dick.txt")
-    pattern = r"\*\*\* .*? \*\*\*"
-    text = from_gutenberg(whale, pattern)
-    ranks = text.rank_words()
+    whale = Path(".data/fake.txt")
+    text = from_file(whale)
 
-    N = len(text.word_arr())
+    N, k, s = text.zipf_params()
+    print(f"Length of corpus: {N}")
+    print(f"Zipf Const: {s}")
+    print(f"ranks: {len(k)}")
     
-    pred = vectorized_zipf(N, [ i+1 for i in range(len(ranks)) ])
+    hapax = text.legomena()
+    print(hapax[:20])
+    pred = vectorized_zipf(N, k, s)
+    ranks = text.rank_words()
 
     actual = np.array(ranks)
     log_a = np.log(actual)
@@ -35,7 +33,7 @@ def main():
     plt.title("Plot of Word Index vs Log Zipf Proportion")
     plt.grid(True)
 
-    plt.savefig(".data/moby_dick.png")
+    plt.savefig(".data/fake.png")
     plt.close()
     
 

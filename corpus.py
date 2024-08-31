@@ -6,14 +6,31 @@ from typing import Tuple, Union, List, Dict
 class Corpus:
     def __init__(self, text: str):
         self.text = text
+        
+        self.legomena_ratio = self.__legomena_ratio()
+
+    def __eq__(self, other: 'Corpus'):
+        return self.text == other.text
+
+    def __len__(self):
+        return len(self.word_arr())
 
     def __repr__(self):
         return f"{self.text[:500]}..." if len(self.text) > 500 else f"{self.text}"
 
-    def __eq__(self, other: 'Corpus'):
-        return self.text == other.text
     
-    
+    def zipf_params(self, s=1) -> Tuple[int, Tuple[int], int]:
+        '''
+        Returns the parameters of the Zipf distribution for the text.
+        
+        Args:
+            s (int): Optional, the Zipf constant
+                - Default: 1
+        '''
+        N = len(self.word_arr())
+        k = tuple([ i+1 for i in range(len(self.rank_words())) ])
+        return N, k, s
+
     def read_lines(self, n: int, start: int=0) -> str:
         '''
         Returns the specified number of lines in the text, starting from the start index.
@@ -87,31 +104,33 @@ class Corpus:
         return list(filter(lambda x: word_count[x] == n, word_count))
 
 
-def from_file(fpath: str) -> Corpus:
+    def __legomena_ratio(self) -> Tuple[float]:
+        legomena = [ len(self.legomena(i)) for i in range(1, 5) ]
+        return tuple([ round(l / min(legomena), 2) for l in legomena ])
+
+
+def from_file(fpath: str, is_gutenberg: bool=False) -> Corpus:
     with open(fpath, 'r') as f:
         text = f.read()
 
+    if is_gutenberg:
+        sep = r"\*\*\* .*? \*\*\*"
+        return __from_gutenberg(text, sep)
+
     return Corpus(text)
 
-def from_gutenberg(fpath: str, sep: Union[str, re.Pattern]) -> Corpus:
-    text = from_file(fpath)
-    pattern = re.compile(sep)
-    text_split = split_text(text, sep=pattern)
+def __from_gutenberg(text: str, sep: Union[str, re.Pattern]) -> Corpus:
+    sep = re.compile(sep)
+    text_split = split_text(text, sep=sep)
     return text_split[1]
 
-def split_text(text: Corpus, sep: Union[str, re.Pattern]=None, maxsplit: int=-1) -> List['Corpus']:
-        if not isinstance(text, Corpus) or text is None:
-            raise TypeError("Text is not of type Corpus")
-
-        if not isinstance(maxsplit, int) or maxsplit is None:
-            raise TypeError("Maxsplit is not of type int")
-
-        if text.text == "":
+def split_text(text: str, sep: Union[str, re.Pattern]=None, maxsplit: int=-1) -> List['Corpus']:
+        if text == "":
             raise ValueError("Text is empty")
 
         if isinstance(sep, re.Pattern):
-            split_text = re.split(pattern=sep, string=text.text)
+            split_text = re.split(pattern=sep, string=text)
         else:
-            split_text = text.text.split(sep=sep, maxsplit=maxsplit)
+            split_text = text.split(sep=sep, maxsplit=maxsplit)
         
         return [ Corpus(text.strip()) for text in split_text ]
