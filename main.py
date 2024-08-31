@@ -15,15 +15,14 @@ def main():
     print(f"Zipf Const: {s}")
     print(f"ranks: {len(k)}")
     
-    hapax = text.legomena()
-    print(hapax[:20])
+    print(text.legomena_ratio)
     pred = vectorized_zipf(N, k, s)
     ranks = text.rank_words()
 
     actual = np.array(ranks)
     log_a = np.log(actual)
     log_v = np.log(pred * N)
-    x = np.log(list(range(1, len(ranks)+1)))
+    x = np.log(k)
 
     plt.figure(figsize=(10,6))
     plt.plot(x, log_v, marker='o')
