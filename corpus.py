@@ -1,4 +1,5 @@
 import re
+import string
 from typing import Tuple, Union, List, Dict
 
 
@@ -28,7 +29,8 @@ class Corpus:
         return '\n'.join([lines[i] for i in range(start, end)])
 
     def word_arr(self) -> List[str]:
-        return self.text.split()
+        text_split = self.text.split()
+        return list(map(lambda x: x.strip(string.punctuation), text_split))
 
     def total_words(self) -> int:
         '''
@@ -54,26 +56,13 @@ class Corpus:
 
         return dict(sorted(word_count.items(), key=lambda x: x[1], reverse=True)) 
     
-    def rank_words(self) -> List[Tuple[int, int]]:
+    def rank_words(self) -> Tuple[int]:
         '''
         Returns the rank of the text by the number of words.
         '''
         word_count = self.get_word_count()
-        words = []
-        for i, (_, count) in enumerate(word_count.items()):
-            words.append((i+1, count))
         
-        return words
-
-    def get_ranked_proportion(self) -> List[Tuple[int, int]]:
-        '''
-        Returns a dictionary of words and their proportion in the text.
-        The proportion is the count of the word divided by the total number of words.
-        '''
-        rank_words = self.rank_words()
-        total_words = self.total_words()
-
-        return [(rank, count/total_words) for rank, count in rank_words]
+        return tuple(word_count.values())
     
     def get_top_words(self, n: int=5) -> Dict[str, int]:
         '''
@@ -96,6 +85,7 @@ class Corpus:
         '''
         word_count = self.get_word_count()
         return list(filter(lambda x: word_count[x] == n, word_count))
+
 
 def from_file(fpath: str) -> Corpus:
     with open(fpath, 'r') as f:
