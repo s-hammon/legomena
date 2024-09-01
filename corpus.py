@@ -21,7 +21,7 @@ class Corpus:
         return f"{self.text[:500]}..." if len(self.text) > 500 else f"{self.text}"
 
     
-    def zipf_params(self, s=1) -> Tuple[int, Tuple[int], int]:
+    def zipf_params(self, s=1, exclude_legomena=False) -> Tuple[int, Tuple[int], int]:
         '''
         Returns the parameters of the Zipf distribution for the text.
         
@@ -35,7 +35,11 @@ class Corpus:
                 - k (Tuple[int]): The rank of each word in the text by frequency of occurrence, descending
                 - s (int): The Zipf constant
         '''
-        N = len(self.word_arr())
+        arr = self.word_arr()
+        if exclude_legomena:
+            arr = list(filter(lambda x: self.word_dict[x] > 4, arr))
+
+        N = len(arr)
         k = tuple([ i+1 for i in range(len(self.rank_words())) ])
         return N, k, s
 
@@ -57,7 +61,7 @@ class Corpus:
         return '\n'.join([lines[i] for i in range(start, end)])
 
     def word_arr(self) -> List[str]:
-        text_split = self.text.split()
+        text_split = self.text.lower().split()
         return list(map(lambda x: x.strip(string.punctuation), text_split))
 
     def total_words(self) -> int:
@@ -110,8 +114,8 @@ class Corpus:
         '''
         word_count = {}
 
-        words = re.findall(r'\b\w+\b', self.text.lower())
-        for word in words:
+        words = self.text.lower().split()
+        for word in list(map(lambda x: x.strip(string.punctuation), words)):
             if word in word_count:
                 word_count[word] += 1
                 continue
