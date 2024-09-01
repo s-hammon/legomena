@@ -200,7 +200,7 @@ def multi_file(file_configs: List[Dict[str, Any]], set_name: str="", combine=Fal
         corpus_list.append(from_file(fpath, name, is_gutenberg))
 
     if combine:
-        text = "\n".join([corpus.text for corpus in corpus_list])
+        text = "\n\n".join([corpus.text for corpus in corpus_list])
         return Corpus(text=text, name=set_name)
 
     return corpus_list

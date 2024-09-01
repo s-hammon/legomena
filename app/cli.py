@@ -20,6 +20,7 @@ def main():
             "--config", "-c",
             help="The path to the configuration file (must be YAML or JSON)",
         )
+        
         subparser.add_argument(
             "--combine", type=bool, default=False,
             help="Combine the text from multiple files into a single corpus. Can only be used with --config",
@@ -28,8 +29,16 @@ def main():
             "--from-gutenberg", type=bool, default=False,
             help="If the text is from Project Gutenberg. Lego will remove header/footer text. Can only be used with --file",
         )
+        subparser.add_argument(
+            "--save", "-s", type=str,
+            help="The path to save the results of the analysis. May be TXT or JSON.",
+        )
 
     zipf_parser = subparsers.add_parser("zipf", help="Analyze the text according to Zipf's Law")
+    zipf_parser.add_argument(
+        "--proportions", type=bool, default=False,
+        help="Include the predicted and actual proportions of each word in the text",
+    )
     add_common_args(zipf_parser)
 
     wordcount_parser = subparsers.add_parser("wordcount", help="Get word dictionary of the text, and teh count of each word that appears.")
@@ -40,6 +49,8 @@ def main():
         raise ValueError("--combine flag can only be used with --config")
     if args.from_gutenberg and not args.file:
         raise ValueError("--from-gutenberg flag can only be used with --file")
+    if args.proportions and not args.save:
+        raise ValueError("Must save --proportions to a file. Use --save to specify the file path.")
 
     if args.command == "zipf":
         zipf_command(**vars(args))
