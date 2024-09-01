@@ -7,7 +7,8 @@ class Corpus:
     def __init__(self, text: str, name: str=""):
         self.name = name
         self.text = text
-        
+
+        self.word_dict = self.__get_word_count()
         self.legomena_ratio = self.__legomena_ratio()
 
     def __eq__(self, other: 'Corpus'):
@@ -65,8 +66,44 @@ class Corpus:
         Calls word_arr() and returns the length of the list.
         '''
         return len(self.word_arr())
+ 
+    
+    def rank_words(self) -> Tuple[int]:
+        '''
+        Returns a tuple of the rank of each word in the text by frequency of occurrence.
+        '''
+        return tuple(self.word_dict.values())
+    
+    def get_top_words(self, n: int=5) -> Dict[str, int]:
+        '''
+        Returns the top n words and their count in the text by frequency of occurrence.
 
-    def get_word_count(self) -> Dict[str, int]:
+        Args:
+            n (int): The number of top words to return
+                - Default: 5
+        
+        Returns:
+            Dict[str, int]: A dictionary of the top n words and their counts
+        '''
+        return dict(list(self.word_dict.items())[:n])
+
+    def legomena(self, n: int=1) -> List[str]:
+        '''
+        Args:
+            n (int): The number of times a word appears in the text
+                - Default: 1 (hapax legomena)
+
+        Returns:
+            List[str]: A list of words that appear exactly n times in the text
+        '''
+        return list(filter(lambda x: self.word_dict[x] == n, self.word_dict))
+
+
+    def __legomena_ratio(self) -> Tuple[float]:
+        legomena = [ len(self.legomena(i)) for i in range(1, 5) ]
+        return tuple([ round(l / min(legomena), 2) for l in legomena ])
+
+    def __get_word_count(self) -> Dict[str, int]:
         '''
         Returns a dictionary of words and their counts in the text.
         It will ignore case and punctuation.
@@ -81,46 +118,7 @@ class Corpus:
 
             word_count[word] = 1
 
-        return dict(sorted(word_count.items(), key=lambda x: x[1], reverse=True)) 
-    
-    def rank_words(self) -> Tuple[int]:
-        '''
-        Returns a tuple of the rank of each word in the text by frequency of occurrence.
-        '''
-        word_count = self.get_word_count()
-        
-        return tuple(word_count.values())
-    
-    def get_top_words(self, n: int=5) -> Dict[str, int]:
-        '''
-        Returns the top n words and their count in the text by frequency of occurrence.
-
-        Args:
-            n (int): The number of top words to return
-                - Default: 5
-        
-        Returns:
-            Dict[str, int]: A dictionary of the top n words and their counts
-        '''
-        word_count = self.get_word_count()
-        return dict(list(word_count.items())[:n])
-
-    def legomena(self, n: int=1) -> List[str]:
-        '''
-        Args:
-            n (int): The number of times a word appears in the text
-                - Default: 1 (hapax legomena)
-
-        Returns:
-            List[str]: A list of words that appear exactly n times in the text
-        '''
-        word_count = self.get_word_count()
-        return list(filter(lambda x: word_count[x] == n, word_count))
-
-
-    def __legomena_ratio(self) -> Tuple[float]:
-        legomena = [ len(self.legomena(i)) for i in range(1, 5) ]
-        return tuple([ round(l / min(legomena), 2) for l in legomena ])
+        return dict(sorted(word_count.items(), key=lambda x: x[1], reverse=True))
 
 
 def from_file(fpath: str, name: str="", is_gutenberg: bool=False) -> Corpus:

@@ -7,7 +7,7 @@ from stats import vectorized_zipf
 
 
 def main():
-    whale = Path(".data/fake.txt")
+    whale = Path(".data/fake2.txt")
     text = from_file(whale)
 
     N, k, s = text.zipf_params()
@@ -32,7 +32,7 @@ def main():
     plt.title("Plot of Word Index vs Log Zipf Proportion")
     plt.grid(True)
 
-    plt.savefig(".data/fake.png")
+    plt.savefig(".data/fake2.png")
     plt.close()
     
 
