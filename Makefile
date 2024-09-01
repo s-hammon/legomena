@@ -14,14 +14,7 @@ $(VENV): requirements.txt
 
 test: $(VENV)
 	@. $(BIN)/activate
-	@${PY} -m unittest discover -s .
-
-run: $(VENV) 
-	@. $(BIN)/activate
-	@${PY} main.py
-
-tidy: $(VENV)
-	@pip list --format=freeze > requirements.txt
+	@${PY} -m unittest discover -s tests
 
 clean:
 	@rm -rf $(VENV)

@@ -105,7 +105,7 @@ class Corpus:
 
     def __legomena_ratio(self) -> Tuple[float]:
         legomena = [ len(self.legomena(i)) for i in range(1, 5) ]
-        return tuple([ round(l / min(legomena), 2) for l in legomena ])
+        return tuple([ round(l / max(min(legomena), 1), 2) for l in legomena ])
 
     def __get_word_count(self) -> Dict[str, int]:
         '''
@@ -148,7 +148,7 @@ def from_file(fpath: str, name: str="", is_gutenberg: bool=False) -> Corpus:
 
     return Corpus(text, name=name)
 
-def split_text(text: str, sep: Union[str, re.Pattern]=None, maxsplit: int=-1) -> List['Corpus']:
+def split_text(text: str, name: str="", sep: Union[str, re.Pattern]=None, maxsplit: int=-1) -> List['Corpus']:
         '''
         Splits the text into a list of Corpus objects. Use this after loading text from a file (using 
         open() or any other method).  After providing the delimiter, the text will be split into a list
@@ -172,7 +172,7 @@ def split_text(text: str, sep: Union[str, re.Pattern]=None, maxsplit: int=-1) ->
         else:
             split_text = text.split(sep=sep, maxsplit=maxsplit)
         
-        return [ Corpus(text.strip()) for text in split_text ]
+        return [ Corpus(text.strip(), name=name) for text in split_text ]
 
 def multi_file(file_configs: List[Dict[str, Any]], set_name: str="", combine=False) -> Union[List[Corpus], Corpus]:
     '''

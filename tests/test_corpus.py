@@ -1,7 +1,7 @@
 import re
 import unittest
 
-from corpus import Corpus, split_text
+from app.corpus import Corpus, split_text
 
 class TestCorpus(unittest.TestCase):
     def test_corpus_split_text(self):
