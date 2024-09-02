@@ -28,6 +28,8 @@ class Corpus:
         Args:
             s (int): Optional, the Zipf constant
                 - Default: 1
+            exclude_legomena (bool): Optional, whether to exclude hapax, dis, tris, and tetrakis legomena
+                - Default: False
 
         Returns:
             Tuple[N, Tuple[k], s]: A tuple of the parameters of the Zipf distribution
@@ -102,6 +104,11 @@ class Corpus:
         '''
         return list(filter(lambda x: self.word_dict[x] == n, self.word_dict))
 
+    def percent_hapax(self) -> float:
+        '''
+        Returns the percentage (in decimal) of words that appear exactly once in the text to the distinct set of words.
+        '''
+        return round(len(self.legomena(1)) / len(self.word_dict), 2)
 
     def __legomena_ratio(self) -> Tuple[float]:
         legomena = [ len(self.legomena(i)) for i in range(1, 5) ]

@@ -20,3 +20,12 @@ clean:
 	@rm -rf $(VENV)
 	@find . -type f -name '*.pyc' -delete
 	@find . -type d -name '__pycache__' -delete
+	@rm -rf build/
+	@rm -rf dist/
+	@rm -rf *.egg-info
+
+# make build
+build:
+	@pip install .
+
+.PHONY: test clean build

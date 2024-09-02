@@ -1,6 +1,6 @@
 import argparse
 
-from main import zipf_command
+from .main import handle_command
 
 def main():
     parser = argparse.ArgumentParser(
@@ -22,11 +22,11 @@ def main():
         )
         
         subparser.add_argument(
-            "--combine", type=bool, default=False,
+            "--combine", action="store_true",
             help="Combine the text from multiple files into a single corpus. Can only be used with --config",
         )
         subparser.add_argument(
-            "--from-gutenberg", type=bool, default=False,
+            "--from-gutenberg", action="store_true",
             help="If the text is from Project Gutenberg. Lego will remove header/footer text. Can only be used with --file",
         )
         subparser.add_argument(
@@ -36,8 +36,12 @@ def main():
 
     zipf_parser = subparsers.add_parser("zipf", help="Analyze the text according to Zipf's Law")
     zipf_parser.add_argument(
-        "--proportions", type=bool, default=False,
+        "--proportions", action="store_true",
         help="Include the predicted and actual proportions of each word in the text",
+    )
+    zipf_parser.add_argument(
+        "--exclude-legomena", action="store_true",
+        help="Exclude hapax, dis, tris, and tetrakis legomena from the analysis",
     )
     add_common_args(zipf_parser)
 
@@ -49,15 +53,12 @@ def main():
         raise ValueError("--combine flag can only be used with --config")
     if args.from_gutenberg and not args.file:
         raise ValueError("--from-gutenberg flag can only be used with --file")
-    if args.proportions and not args.save:
-        raise ValueError("Must save --proportions to a file. Use --save to specify the file path.")
-
+    
     if args.command == "zipf":
-        zipf_command(**vars(args))
-    elif args.command == "wordcount":
-        raise NotImplementedError("Wordcount is not yet implemented.")
-    else:
-        parser.print_help()
+        if args.proportions and not args.save:
+            raise ValueError("Must save --proportions to a file. Use --save to specify the file path.")
 
+    handle_command(**vars(args))       
 
-main()
+if __name__ == "__main__":
+    main()
